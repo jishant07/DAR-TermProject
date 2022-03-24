@@ -1,0 +1,9 @@
+---
+title: "Effect of Socio-Economic Factors on Student's Performance"
+author: "Jishant Acharya"
+date: "22/03/2022"
+output: pdf_document
+---
+
+## **Introduction** :
+School has become a place to compete against the world to prove yourself and set yourself apart from the crowd to excel. This is done to measure everyone's grasping power with the same yardstick marks. This is in no way the right manner to judge a person's intelligence. Each individual is different, everyone comes from a varied set of backgrounds. There can never be a single yardstick that can measure each and everyone. This analysis is trying to prove that only.
