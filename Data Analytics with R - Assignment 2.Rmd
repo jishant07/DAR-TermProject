@@ -6,4 +6,57 @@ output: pdf_document
 ---
 
 ## **Introduction** :
-School has become a place to compete against the world to prove yourself and set yourself apart from the crowd to excel. This is done to measure everyone's grasping power with the same yardstick marks. This is in no way the right manner to judge a person's intelligence. Each individual is different, everyone comes from a varied set of backgrounds. There can never be a single yardstick that can measure each and everyone. This analysis is trying to prove that only.
+School has become a place to compete against the world to prove yourself and set yourself apart from the crowd to excel. This is done to measure everyone's grasping power with the same yardstick marks. This is in no way the right manner to judge a person's intelligence. Each individual is different, everyone comes from a varied set of backgrounds. There can never be a single yardstick that can measure each and everyone. This analysis is trying to prove that. 
+
+```{r include=FALSE} 
+  library(knitr)
+  library(ggplot2)
+
+  student.mat <- read.csv("./dataset/student-mat.csv",header = TRUE, sep = ";")
+  student.mat <- as.data.frame(student.mat)
+  student.mat <- subset(student.mat, select = -c(reason,guardian,activities,higher,Dalc,Walc))
+  
+  #Color Scheme
+  primary = "#ff4242"
+  secondary = "#4d9de0"
+  third = "#3BB273"
+  
+```
+
+```{r include = FALSE}
+  knitr::opts_chunk$set(echo = TRUE, fig.align="center")
+```
+
+## Dataset Description
+
+The following is an extensive dataset that has many social factors also included in the records. There are 3 types of marks. G1, G2 and G3 are three marks that correspond to the first period, second period and the final marks. There are other factors present in the dataset that range from being related socially to being able to show economical situation of the student.
+
+```{r}
+  data_scheme <- read.csv("./Book1.csv")
+  kable(data_scheme,caption="Data Description")
+```
+```{r} 
+  head(student.mat,3)
+```
+
+# Analysis
+
+
+### Gender Distribution
+
+```{r out.width="50%", fig.cap="Population distribution between genders", fig.align='center'}
+  ggplot(student.mat, aes(x=sex)) + geom_bar(stat = "count",width = 0.5,fill=primary)
+```
+
+> This graph shows that there is no class bias in the dataset, the number of male is almost similar to the number of females.
+
+** Frequency Distribution of Male Population **
+
+```{r}
+  ggplot(student.mat[student.mat$sex == "M",], aes(age)) + geom_histogram(fill=primary,stat = "count")
+```
+
+```{r}
+  ggplot(student.mat[student.mat$sex == "F",], aes(age)) + geom_histogram(stat="count")
+```
+
