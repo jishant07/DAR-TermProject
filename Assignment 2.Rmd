@@ -9,19 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
-## References
-
-1. S. Kotsiantis , C. Pierrakeas & P. Pintelas ; Predicting Students' Performance In Distance Learning Using Machine Learning Techniques
-2. Paulo Cortez and Alice Silva ; Using Data Mining to Predict Secondary School Student Performance
-3. Juan-José Navarro1, Javier García-Rubio, Pedro R. Olivares ; The Relative Age Effect and Its Influence on
-Academic Performance
-4. Kawtar Tani, Elizabeth Dalzell, Nathan Ehambaranathan, Sheela Murugasu and Anne Steele ; Evaluation of factors affecting students’ performance
-in tertiary education 
-5. Thomas R. Ford ; Social Factors Affecting Academic Performance: Further Evidence
-6. Yaoran Li , Jeff Allen , Alex Casillas ; Relating psychological and social factors to academic performance: A longitudinal investigation of high-poverty
-middle school students
-
-## **Introduction** :
+## **Introduction**
 School has become a place to compete against the world to prove yourself and set yourself apart from the crowd to excel. This is done to measure everyone's grasping power with the same yardstick marks. This is in no way the right manner to judge a person's intelligence. Each individual is different, everyone comes from a varied set of backgrounds. There can never be a single yardstick that can measure each and everyone. This analysis is trying to prove that.  
 There are various effects that have been in place in the background and have different effects on the ability of the student to perform in exams.   
 .  
@@ -37,15 +25,30 @@ The main idea is to find the factors that directly or indirectly affect the stud
 .  
 We will be running a analysis that works to yield relation with with final marks for the above mentioned reasons but we also will be working in finding indirect influences by working on 2 columns that are dependent on each other which in-turn has an effect on the final marks.
 
+## References
+
+1. S. Kotsiantis , C. Pierrakeas & P. Pintelas ; Predicting Students' Performance In Distance Learning Using Machine Learning Techniques
+2. Paulo Cortez and Alice Silva ; Using Data Mining to Predict Secondary School Student Performance
+3. Juan-José Navarro1, Javier García-Rubio, Pedro R. Olivares ; The Relative Age Effect and Its Influence on
+Academic Performance
+4. Kawtar Tani, Elizabeth Dalzell, Nathan Ehambaranathan, Sheela Murugasu and Anne Steele ; Evaluation of factors affecting students’ performance
+in tertiary education 
+5. Thomas R. Ford ; Social Factors Affecting Academic Performance: Further Evidence
+6. Yaoran Li , Jeff Allen , Alex Casillas ; Relating psychological and social factors to academic performance: A longitudinal investigation of high-poverty
+middle school students
+
 ```{r include=FALSE} 
   library(ggplot2)
   library(rstatix)
   
+  #Reading in the data set.
   student.mat <- read.csv("./dataset/student-mat.csv",header = TRUE, sep = ";")
   student.mat <- as.data.frame(student.mat)
-  student.mat <- subset(student.mat, select = -c(reason,guardian,activities,higher,Dalc,Walc,famrel))
   
-  #Segregating the Dataset into two populations
+  #sub-setting the needed columns for the analysis
+  student.mat <- student.mat[,c("school","age","sex","schoolsup","famsup","Pstatus","G1","G2","G3","health")]
+  
+  #Segregating the Data set into two populations
   male_students <- student.mat[student.mat$sex == "M",]
   female_students <- student.mat[student.mat$sex == "F",]
   
@@ -58,24 +61,47 @@ We will be running a analysis that works to yield relation with with final marks
 
 ## Dataset Description
 
-The following is an extensive data set that has many social factors also included in the records. There are 3 types of marks. G1, G2 and G3 are three marks that correspond to the first period, second period and the final marks. There are other factors present in the data set that range from being related socially to being able to show economical situation of the student.
-
-```{r include = FALSE}
-  data_scheme <- read.csv("./Book1.csv")
-```
-
+ Variable | Type | Description
+ ---------|------|------------
+ School   | Categorical | One of the 2 schools in the data set
+ Age      | Continuous  | Age from 18 -22
+ sex      | Categorical | Male or Female
+ schoolsup| Categorical | Yes / No for support from school
+ famsup   | Categorical | Yes / No for support from family
+ Pstatus  | Categorical | Living ’T’ (Together) or ’A’ (Apart)
+ G1       | Continuous  | Marks of first period
+ G2       | Continuous  | Marks of second period
+ G3       | Continuous  | Marks of third period
+ 
 ```{r echo=FALSE} 
-  show(data_scheme)
   head(student.mat,3)
 ```
+ 
+This data set has been taken from a previous research^2^ that tried to predict performance of the students based on various things that influence it. It was found at various instances that there is an influence of many social and economical factors on the marks of a particular student. The data set has variables with the help of which we will try and prove the same.  
 
-# Analysis
+### Variable Description
+
+- **School** variable is set between one of the two school of which the data is, GP moniker is given to the Gabriel Pereira School and MS tag is given to the Mousinho da Silveira School. This will help when we want to check if school has any significant influence.
+- **Age** variable is a generic variable set to get context of the intelligence of the person. We have have a research that concluded that a person's ability to perform decreases with age^3^. We will use this pegged against the final score to back the research
+- **Sex** this can also be a factor to predict or influence score ofa student. We know this by a previously done research that states that females are more prone to become overachievers than men^5^. This will help us put itself against G3 marks and then prove the said conclusion.
+- **Schoolsup** is a categorical variable that states if the school supports the student or not. This support can also be the reason for a students score going up or down depending on the relation.
+- **Famsup** is a categorical variable that states if family supports that student or not. This support and can also influence the performance.
+- **PStatus** this is a categorical variable that signifies the cohabitation situation of the student and their parents.It says 'T' of they are living together and 'A' is the student is living alone.
+- **G1** this is a continuous range of marks from 0-20, 0 being the lowest and 20 being perfect. This variable signifies the marks obtained in the first period.
+- **G2** this is a continuous range of marks from 0-20, 0 being the lowest and 20 being perfect. This variable signifies the marks obtained in the second period.
+- **G3** this is a continuous range of marks from 0-20, 0 being the lowest and 20 being perfect. This variable signifies the marks obtained in the third period.
+
+
+
+# Method
 
 **Gender Distribution**
 
 ```{r out.width="50%", fig.cap="Population distribution between genders", fig.align='center', echo=FALSE}
-  ggplot(student.mat, aes(x=sex)) + geom_bar(stat = "count",width = 0.5,fill=primary) #Gives out the Gender Distribution graph 
+  #Gives out the Gender Distribution graph
+  ggplot(student.mat, aes(x=sex)) + geom_bar(stat = "count",width = 0.5,fill=primary) 
 ```
+
 ```{r}
   paste("Total number of students in the sample", nrow(student.mat))
   paste("Number of Male Students: ",nrow(student.mat[student.mat$sex == 'M',]))
@@ -86,7 +112,7 @@ The following is an extensive data set that has many social factors also include
 
 **Frequency Distribution of Male Population**
 
-```{r out.width="50%", fig.align='center', fig.cap="Male Population frequency distribution"}
+```{r out.width="50%", fig.align='center', fig.cap="Male Population frequency distribution",echo=FALSE}
   
   #Plots the Male Age Frequency distribution, along side plotting the mean and the median lines
   
@@ -100,7 +126,7 @@ The following is an extensive data set that has many social factors also include
 
 **Frequency Distribution of Female Population**
 
-```{r out.width="50%", fig.align='center', fig.cap="Female population frequency distribution"}
+```{r out.width="50%", fig.align='center', fig.cap="Female population frequency distribution", echo=FALSE}
   
   #Plots the Female Age Frequency distribution, along side plotting median and mean line
 
@@ -112,21 +138,7 @@ The following is an extensive data set that has many social factors also include
 
 > This shows that the distribution is slightly skewed to the right but not by a lot. Here also the green line shows the median and the blue line shows the mean of the distribution.
 
-## Dependance of Age on Marks (Liner Regression)
-
-```{r out.width="50%", fig.cap="Age v/s G3 Regression", fig.align='center', echo=FALSE}
-  #Generates the Scatter Plot and the Liner Regression Line.
-  ggplot(student.mat,aes(age,G3)) + geom_point(color=primary) + geom_smooth(method = 'lm', color=third)
-```
-
-```{r}
-  #Gives the Liner Model Coefficient and Intercept
-  lm(G3 ~ age, data=student.mat)
-```
-
-**Result** : _The purpose of the test was to yield the relationship between age and marks of the student. The sample space was of 395 student and their final semester marks we taken into consideration. We performed linear regression on the variables and found a negative correlation. This shows that not only there is a dependence of age on marks but it's negative in nature which means as age progresses, marks of the student will come down.The estimation formula comes out to be $\hat{y} = 20.1011 - (0.5801)age$._
-
-## Dependance of Sex on the Living Arrangement
+# Dependance of Sex on the Living Arrangement
 
 _To get the dependence as they both are categorical in nature, we prefer using the Chi Square Test of Independence to test the significance of one on the other._
 
@@ -134,17 +146,16 @@ _To get the dependence as they both are categorical in nature, we prefer using t
 **H~1~** : *There is significant dependence between sex and living arrangement*
 
 ```{r}
-
   #Does a Chi Square Test Of Independence
-
   chisq.test(student.mat$sex,student.mat$Pstatus)
 ```
+
 > Here we see the P-value of the test comes out to be 0.76 which is greater than 0.05 which is the threshold value to reject the Null Hypothesis and shift to the alternate hypothesis.
 
 
 **Result** : _We seek to determine if there is a significant dependence of sex on the living arrangement`. 395 Students from both the schools combined were used as a sample. The sample population constituted 208 female and 187 male candidates. A Chi Square Test revealed the X^2 value of 0.09, degree of freedom to be 1 and the p-value to be 0.76. This means that we reject the null hypothesis and select the alternate hypothesis that says that there is a significant dependence between the 2 metrics._
 
-## Difference in Male & Female popoulaion with respect to marks
+# Difference in Male & Female popoulaion with respect to marks
 
 > We will work this out using a Independant Sample T-Test as the sample space is the same but we have divided them into groups to find if gender influences marks.  
 Here we will use all the marks namely G1, G2 & G3 to understand if different period marks have different effect.
@@ -156,10 +167,13 @@ We will use the same hypothesis for all the three tests between the separated po
 
 
 ```{r}
-  pulled_df <- as.data.frame(as.data.frame(student.mat)[,c("sex","G1","G2","G3")]) #Making a selective data frame
+  pulled_df <- as.data.frame(as.data.frame(student.mat)[,c("sex","G1","G2","G3")])  
+  #Making a selective data frame
   gender.groupings <- group_by(pulled_df, sex)
   get_summary_stats(gender.groupings) #getting summary
-  
+```
+
+```{r}  
   #Helps find out outliers in the corresponding columns
   identify_outliers(gender.groupings,G1)
   identify_outliers(gender.groupings,G2)
@@ -175,7 +189,21 @@ We will use the same hypothesis for all the three tests between the separated po
 
 **Result**: _We did this test to determine if gender influences any test scores. The tests were conducted for marks from all the periods that are namely G1, G2 and G3 respectively. The sample space was populated with a total of 395 students of which 208 are female and 187 are male candidates. We performed t-tests for finding if there is a difference in means of both the groups. In all the three tests pegged to the test period we found that there is a difference in the sample means for all the test periods. This test reveals that gender does influence marks irrespective of the test period in question._
 
-## Difference between the 2 schools
+# Dependance of Age on Marks (Linear Regression)
+
+```{r out.width="50%", fig.cap="Age v/s G3 Regression", fig.align='center', echo=FALSE}
+  #Generates the Scatter Plot and the Liner Regression Line.
+  ggplot(student.mat,aes(age,G3)) + geom_point(color=primary) + geom_smooth(method = 'lm', color=third)
+```
+
+```{r}
+  #Gives the Liner Model Coefficient and Intercept
+  lm(G3 ~ age, data=student.mat)
+```
+
+**Result** : _The purpose of the test was to yield the relationship between age and marks of the student. The sample space was of 395 student and their final semester marks we taken into consideration. We performed linear regression on the variables and found a negative correlation. This shows that not only there is a dependence of age on marks but it's negative in nature which means as age progresses, marks of the student will come down.The estimation formula comes out to be $\hat{y} = 20.1011 - (0.5801)age$._
+
+# Difference between the 2 schools
 
 ```{r include=FALSE}
   gp_school <- student.mat[student.mat$school == 'GP',]
@@ -196,10 +224,14 @@ We will use the same hypothesis for all the three tests between the separated po
 
 ```{r} 
   get_summary_stats(school.grouping)
+  #Identify outliers of the variable.
   identify_outliers(school.grouping, G1)
   identify_outliers(school.grouping, G2)
   identify_outliers(school.grouping, G3)
-  
+```
+
+```{r}
+  #Perform corresponding t tests.
   t.test(ms_school$G1, gp_school$G1)
   t.test(ms_school$G2, gp_school$G2)
   t.test(ms_school$G3, gp_school$G3)
@@ -207,27 +239,34 @@ We will use the same hypothesis for all the three tests between the separated po
 
 **Result**: _We conducted the test to understand if they type of school has an influence on the marks that for all the periods. The sample space has 349 student from the GP school and 46 from the MS school. We ran T-Tests of independence and we found that the means are not equal. Which means that we reject the null hypothesis of equal means and understand that school has significant influence on the marks a student gets._
 
-## Multiple Regression for Correlation 
+# Multiple Regression for Correlation 
 
-### Between G1,G2 and G3 (Multiple Regression)
+## Between G1,G2 and G3 (Multiple Regression)
 
-```{r out.width="50%", fig.cap="G1 marks vs G3 Marks with Regression Line", fig.align='center'} 
-  ggplot(student.mat, aes(x=G1, y=G3)) + geom_point(color=primary) + 
-  geom_smooth(method='lm',color=third)
-```
-```{r out.width="50%", fig.cap="G2 marks vs G3 Marks with Regression Line", fig.align='center'}
-  ggplot(student.mat, aes(x=G2, y=G3)) + geom_point(color=primary) + 
-  geom_smooth(method='lm',color=third)
-```
-
+### Mutiple regression with Intercepts and The coefficients
+  
 ```{r}
   # Multiple Regression
   lm(G3 ~ G1+G2, data = student.mat)
 ```
 
+### Shows the linear regression of G1 and G3
+
+```{r out.width="50%", fig.cap="G1 marks vs G3 Marks with Linear Regression Line", fig.align='center', echo=FALSE} 
+  ggplot(student.mat, aes(x=G1, y=G3)) + geom_point(color=primary) + 
+  geom_smooth(method='lm',color=third)
+```
+
+### Shows the linear regression of G2 and G3
+
+```{r out.width="50%", fig.cap="G2 marks vs G3 Marks with Liner Regression Line", fig.align='center', echo=FALSE}
+  ggplot(student.mat, aes(x=G2, y=G3)) + geom_point(color=primary) + 
+  geom_smooth(method='lm',color=third)
+```
+
 **Result**: _We conducted test to see if there is a correlation between the G1, G2 v/s G3 marks. This would help us understand if there is a dependence on the final marks by the past marks. We did a multiple regression between G1, G2 and G3 to get the regression formula that will help us get the approximate relation between the said variables. $\hat{y} = -1.83 + (0.1533)G1 + (0.9869)G2$ came out to be the final multiple regression relationship._
 
-## ANOVA between Family Support, School Support and G3 marks.
+# ANOVA between Family Support, School Support and G3 marks.
 
 **H~0~** : *There is no dependence of Marks on the Family and School Support*  
 **H~1~** : *There is dependence of Marks on the Family and School Support*
@@ -240,22 +279,31 @@ We will use the same hypothesis for all the three tests between the separated po
 
 ```{r}
   
+  #identifying outliers for assumptions
   identify_outliers(student.mat, G3)
+  #Test for normal distribution
   shapiro_test(student.mat, G3)
+  #Test for homogeneity of Variance
   levene_test(student.mat,G3 ~ famsup*schoolsup)
+  
+  #ANOVA Test for significance of effect.
   anova_test(student.mat, G3 ~ famsup*schoolsup)
+```
 
+```{r}
+  #Posthoc test for Two Way Anova
   model <- lm(G3 ~ famsup+schoolsup,data = student.mat)
   anova_school_grouping <- group_by(student.mat, schoolsup)
   anova_test(anova_school_grouping, G3 ~ famsup, error = model)
-  
 ```
 
 **Result**: _We did the test in order to check if there is any influence of family and school's support on the marks of the student. We performed an Two-Way ANOVA in order to test the hypotheses. The p-values for all the relations came back positive that shows that school support and family support individually also have an influence on the student's marks. Combined family and school support yields a p-value of 0.391 which satisfies p > 0.05 and hence we reject the null hypothesis and understand that family and school support together have a significant influence on the final period marks. Furthermore the posthoc reveals that there is an impact of school support that influences the student's marks. It shows that there is a significance effect on marks of the student when family supports but that effect increases when the school also supports at the same time._
 
+# Final Result
 
-## Conclusion
+_As we see from the numerous tests performed, we are able to conclude that marks cannot be the only yardstick to measure a student's intelligence and that we need to change the metric somehow.As not all have an equal footing on the world nor have all the same background.When we tried to see an what affects the score we were able to find a very strong correlation between the previous and the final period marks. Further we investigated the the effects of aging and found that with increase in age the ability to score also goes down.Additionally, when we tried to get the effects of gender on the final marks it came out that there is a significant effect of gender on the marks of the student. We further tried to find if the student's gender has any effect on the habitation and found a dependence on one another. We also could test that even the type of school a student goes to can effect the marks the student can get._
 
-_We were able to understand that there are a lot of factors to be considered that have a direct or an indirect influence on the marks of the student._
+# Conclusion
 
+_All this just proves the fact that a student performance isn't agnostic to socio economic factors, rather it's dependence is quite significant and if we want to alleviate a student performance we might need to work on the factors revolving students like the ones we tested to help students get there. This can help teacher and school authorities plan their teachings and also help them pave a way towards a better result posted by the student_
 
